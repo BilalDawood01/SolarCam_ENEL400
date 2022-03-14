@@ -1,0 +1,6 @@
+Camera must be attachable to any surface
+Camera must have indication on battery level (LED?)
+PIR sensor opening
+Space between the two boards
+PCBs???
+Solar panel (attach or detach?)
