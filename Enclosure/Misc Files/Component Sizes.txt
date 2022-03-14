@@ -1,0 +1,9 @@
+Solar Panel: 1.773" L x 1.417" W x 0.071" H
+ESP32 CAM Board: 1.6" L x 1.07" W x 0.18" H
+PIR Sensor Board: 1.42" L x 1.02" W x 0.83" H
+BOOST: 1.15" L x 0.9" W
+CHG SOLAR: 1.5" L x 1.3" W
+
+
+SOLAR PANEL: ATTACHABLE BUT NOT ON CAMERA
+PCB:
