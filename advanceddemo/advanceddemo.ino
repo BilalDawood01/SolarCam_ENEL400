@@ -33,8 +33,6 @@
 
 void setup() 
 {
-  delay(5000);
-  
   Serial.println("Ready... Set... Go!");
   // SETTING UP SERIAL COMMUNICATION -----------------------------------
   Serial.begin(115200);                         // Sets the data rate in bits per second (baud) for serial data transmission.
@@ -84,7 +82,6 @@ void setup()
     Serial.printf("Camera init failed with error 0x%x", err);
   } else {
     Serial.println("Initialized the Camera!");
-    
   }
   
 }
