@@ -1,9 +1,44 @@
+// INCLUDE LIBRARIES
+#include "Arduino.h"              // General Functionality
+#include "esp_camera.h"           // Camera
+//#include <SD.h>                   // SD Card
+//#include "FS.h"                   // File System
+//#include "soc/soc.h"              // Disable brownout problems
+//#include "soc/rtc_cntl_reg.h"     // Disable brownout problems
+//#include "driver/rtc_io.h"
+//#include <EEPROM.h>               // read and write from flash memory
+//#include <WiFi.h>                 // WiFi Functionality
+//#include "time.h"                 // Time functions
+//#include "ESP_Mail_Client.h"      // e-Mail Functionality
+
+#define CAMERA_MODEL_AI_THINKER
+
+#define PWDN_GPIO_NUM     32
+#define RESET_GPIO_NUM    -1
+#define XCLK_GPIO_NUM      0
+#define SIOD_GPIO_NUM     26
+#define SIOC_GPIO_NUM     27
+
+#define Y9_GPIO_NUM       35
+#define Y8_GPIO_NUM       34
+#define Y7_GPIO_NUM       39
+#define Y6_GPIO_NUM       36
+#define Y5_GPIO_NUM       21
+#define Y4_GPIO_NUM       19
+#define Y3_GPIO_NUM       18
+#define Y2_GPIO_NUM        5
+#define VSYNC_GPIO_NUM    25
+#define HREF_GPIO_NUM     23
+#define PCLK_GPIO_NUM     22
+
 void setup() 
 {
+  delay(5000);
+  
   Serial.println("Ready... Set... Go!");
   // SETTING UP SERIAL COMMUNICATION -----------------------------------
   Serial.begin(115200);                         // Sets the data rate in bits per second (baud) for serial data transmission.
-
+  
   // PIN DEFINITIONS FOR AI THINKER -----------------------------------
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
@@ -49,6 +84,7 @@ void setup()
     Serial.printf("Camera init failed with error 0x%x", err);
   } else {
     Serial.println("Initialized the Camera!");
+    
   }
   
 }
