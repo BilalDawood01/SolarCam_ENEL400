@@ -1,7 +1,7 @@
 
 // Define minimal time to record after every sensor activation 
 #define waitTime 5                            // Wait Time defined in seconds
-#define FPS 10                                // Frames Per Second
+#define FPS 1                                // Frames Per Second
 #define LoopDelay 1000/FPS                    // Delay Between Frames
 
 /* ----- ----- SET MOTION SENSOR INPUT PIN AND LEDPin OUTPUT PIN VALUES ----- ----- */
