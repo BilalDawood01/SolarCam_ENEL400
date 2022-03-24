@@ -1,4 +1,6 @@
 // INCLUDE LIBRARIES
+#include "esp_log.h"
+#include "esp_http_server.h"
 #include "Arduino.h"              // General Functionality
 #include "esp_camera.h"           // Camera
 #include <SD.h>                   // SD Card
@@ -16,8 +18,7 @@
 #define FPS 1                                // Frames Per Second
 #define LoopDelay 1000/FPS                    // Delay Between Frames
 
-/* ----- ----- SET MOTION SENSOR INPUT PIN AND LEDPin OUTPUT PIN VALUES ----- ----- */
-const int LEDPin = 13;               
+/* ----- ----- SET MOTION SENSOR INPUT PIN ----- ----- */            
 const int MSPin = 14;
 uint16_t picNum = 1;
 
@@ -38,8 +39,6 @@ void setup()
 
   // SETTING UP PINS -----------------------------------
   pinMode(MSPin, INPUT_PULLUP);                 // Set PIR Motion Sensor mode to INPUT_PULLUP
-  pinMode(LEDPin, OUTPUT);                      // Set LEDPin pin as an output
-  digitalWrite(LEDPin, LOW);                    // Set LEDPin pin to LOW
 
   // PIN DEFINITIONS FOR AI THINKER -----------------------------------
   camera_config_t config;
@@ -92,8 +91,6 @@ void setup()
     } else {
       Serial.println("DigitalRead Low but Within Wait Time"); 
     }
-    
-    digitalWrite(LEDPin, HIGH);                 // Set LEDPin pin to HIGH
 
     // Initialize memory for frame buffer
       camera_fb_t * fb = NULL;
@@ -116,11 +113,11 @@ void setup()
     fs::FS &fs = SD;
     File file = fs.open(path.c_str(), FILE_WRITE);
     if(!file){
-      Serial.println("Failed to save to path: %s\n", path.c_str());
+      Serial.printf("Failed to save to path: %s\n", path.c_str());
       sleep();
     } else {
       file.write(fb->buf, fb->len); // payload (image), payload length
-      Serial.println("Saved file to path: %s\n", path.c_str());
+      Serial.printf("Saved file to path: %s\n", path.c_str());
     }
     file.close();
     esp_camera_fb_return(fb);
@@ -129,7 +126,6 @@ void setup()
   }
 
   Serial.println("DigitalRead Low");
-  digitalWrite(LEDPin, LOW);                    // Set LEDPin pin to LOW
 
   // GOING TO DEEP SLEEP -----------------------------------
   sleep();

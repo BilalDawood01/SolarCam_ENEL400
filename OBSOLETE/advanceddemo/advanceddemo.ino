@@ -1,15 +1,15 @@
 // INCLUDE LIBRARIES
 #include "Arduino.h"              // General Functionality
 #include "esp_camera.h"           // Camera
-//#include <SD.h>                   // SD Card
-//#include "FS.h"                   // File System
-//#include "soc/soc.h"              // Disable brownout problems
-//#include "soc/rtc_cntl_reg.h"     // Disable brownout problems
-//#include "driver/rtc_io.h"
-//#include <EEPROM.h>               // read and write from flash memory
-//#include <WiFi.h>                 // WiFi Functionality
-//#include "time.h"                 // Time functions
-//#include "ESP_Mail_Client.h"      // e-Mail Functionality
+#include <SD.h>                   // SD Card
+#include "FS.h"                   // File System
+#include "soc/soc.h"              // Disable brownout problems
+#include "soc/rtc_cntl_reg.h"     // Disable brownout problems
+#include "driver/rtc_io.h"
+#include <EEPROM.h>               // read and write from flash memory
+#include <WiFi.h>                 // WiFi Functionality
+#include "time.h"                 // Time functions
+#include "ESP_Mail_Client.h"      // e-Mail Functionality
 
 #define CAMERA_MODEL_AI_THINKER
 
