@@ -422,23 +422,24 @@ void setup() {
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector  // creates other problems
 
   Serial.begin(115200);
-
   Serial.setDebugOutput(true);
 
-  // zzz
-  Serial.println("                                    ");
-  Serial.println("-------------------------------------");
-  Serial.println("ESP-CAM Video Recorder v39\n");
-  Serial.println(" http://desklens.local - to access the camera\n");
-  Serial.println("-------------------------------------");
+  Serial.println("We've Woken Up!");
+  
+//
+//  // zzz
+//  Serial.println("                                    ");
+//  Serial.println("-------------------------------------");
+//  Serial.println("ESP-CAM Video Recorder v39\n");
+//  Serial.println(" http://desklens.local - to access the camera\n");
+//  Serial.println("-------------------------------------");
+//
+//  print_stats("Begin setup Core: ");
 
-  print_stats("Begin setup Core: ");
-
-  pinMode(33, OUTPUT);    // little red led on back of chip
-
-  digitalWrite(33, LOW);           // turn on the red LED on the back of chip
-
-
+//  pinMode(33, OUTPUT);    // little red led on back of chip
+//
+//  digitalWrite(33, LOW);           // turn on the red LED on the back of chip
+  
   eventID = WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info) {
     Serial.print("WiFi lost connection. Reason: ");
     Serial.println(info.disconnected.reason);
@@ -518,29 +519,29 @@ void setup() {
 
   print_stats("After SD init Core: ");
 
-  startCameraServer();
-
-  print_stats("After Server init Core: ");
+//  startCameraServer();
+//
+//  print_stats("After Server init Core: ");
 
   // zzz username and password for ftp server
 
-  ftpSrv.begin("esp", "esp");
-
-  print_stats("After ftp init Core: ");
-
-  digitalWrite(33, HIGH);
+//  ftpSrv.begin("esp", "esp");
+//
+//  print_stats("After ftp init Core: ");
+//
+//  digitalWrite(33, HIGH);
 
   //
   //  startup defaults  -- EDIT HERE
   //  zzz
 
   framesize = 10;  // uxga
-  repeat = 2;    // 100 files
+  repeat = 1;    // 100 files
   xspeed = 1;     // 30x playback speed
   gray = 0;        // not gray
   quality = 10;    // 10 on the 0..64 scale, or 10..50 subscale
   capture_interval = 1000; // 1000 ms or 1 second
-  total_frames = 18;     // 1800 frames or 60 x 30 = 30 minutes
+  total_frames = 10;     // 60 seconds
   xlength = total_frames * capture_interval / 1000;
 
   new_config = 5;  // 5 means we have not configured the camera
@@ -556,9 +557,9 @@ void setup() {
   recording = 1;  // we are recording
 
 
-  Serial.print("Camera Ready! Use 'http://");
-  Serial.print(WiFi.localIP());
-  Serial.println("' to connect");
+//  Serial.print("Camera Ready! Use 'http://");
+//  Serial.print(WiFi.localIP());
+//  Serial.println("' to connect");
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
