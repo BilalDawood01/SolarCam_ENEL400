@@ -418,7 +418,7 @@ WiFiEventId_t eventID;
 // setup() runs on cpu 1
 //
 
-const int MSPin = 12;
+const int MSPin = 0;
 
 void setup() {
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector  // creates other problems
@@ -555,11 +555,10 @@ void setup() {
 
   newfile = 0;    // no file is open  // don't fiddle with this!
   recording = 0;  // we are NOT recording
-
-  config_camera();
-
-  recording = 1;  // we are recording
-
+  if(digitalRead(MSPin)){
+    config_camera();
+    recording = 1;  // we are recording
+  } 
 
 //  Serial.print("Camera Ready! Use 'http://");
 //  Serial.print(WiFi.localIP());
@@ -568,7 +567,7 @@ void setup() {
   // GOING TO DEEP SLEEP -----------------------------------
   Serial.println("Going to Sleep...");
   Serial.flush();
-  esp_sleep_enable_ext0_wakeup(GPIO_NUM_3,1);
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_0,1);
   esp_deep_sleep_start();
 }
 
@@ -728,7 +727,13 @@ static esp_err_t init_sdcard()
 {
   esp_err_t ret = ESP_FAIL;
   sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+  // this tells SD host to keep using 1-line bus mode
+//  host.flags = SDMMC_HOST_FLAG_1BIT;
+
   sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
+  // this tells the driver to only initialize 1 data line
+//  slot_config.width = 1;
+    
   esp_vfs_fat_sdmmc_mount_config_t mount_config = {
     .format_if_mount_failed = false,
     .max_files = 10,
