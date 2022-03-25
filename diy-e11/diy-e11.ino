@@ -418,6 +418,8 @@ WiFiEventId_t eventID;
 // setup() runs on cpu 1
 //
 
+const int MSPin = 12;
+
 void setup() {
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector  // creates other problems
 
@@ -425,6 +427,8 @@ void setup() {
   Serial.setDebugOutput(true);
 
   Serial.println("We've Woken Up!");
+
+  pinMode(MSPin, INPUT_PULLUP);                 // Set PIR Motion Sensor mode to INPUT_PULLUP
   
 //
 //  // zzz
@@ -536,7 +540,7 @@ void setup() {
   //  zzz
 
   framesize = 10;  // uxga
-  repeat = 1;    // 100 files
+  repeat = 0;    // 100 files
   xspeed = 1;     // 30x playback speed
   gray = 0;        // not gray
   quality = 10;    // 10 on the 0..64 scale, or 10..50 subscale
@@ -560,6 +564,12 @@ void setup() {
 //  Serial.print("Camera Ready! Use 'http://");
 //  Serial.print(WiFi.localIP());
 //  Serial.println("' to connect");
+
+  // GOING TO DEEP SLEEP -----------------------------------
+  Serial.println("Going to Sleep...");
+  Serial.flush();
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_3,1);
+  esp_deep_sleep_start();
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -780,7 +790,7 @@ void make_avi( ) {
 
       if (newfile == 1 && recording == 1) {                            // regular recording
 
-        if (frames_so_far >= total_frames)  {                                // we are done the recording
+        if (frames_so_far >= total_frames && !digitalRead(MSPin))  {                                // we are done the recording
 
           Serial.println("Done capture for total frames!");
 
@@ -797,7 +807,7 @@ void make_avi( ) {
             recording = 0;
           }
 
-        } else if ((millis() - startms) > (total_frames * capture_interval)) {
+        } else if ((millis() - startms) > (total_frames * capture_interval) && !digitalRead(MSPin)) {
 
           Serial.println (" "); Serial.println("Done capture for time");
           Serial.print("Time Elapsed: "); Serial.print(millis() - startms); Serial.print(" Frames: "); Serial.println(frame_cnt);
@@ -1281,20 +1291,20 @@ long last_wakeup = 0;
 void loop()
 {
 
-  if (WiFi.status() != WL_CONNECTED) {
-    init_wifi();
-    Serial.println("***** WiFi reconnect *****");
-  }
-
-  wakeup = millis();
-  if (wakeup - last_wakeup > (10 * 60 * 1000) ) {       // 10 minutes
-    last_wakeup = millis();
-
-    print_stats("Wakeup in loop() Core: ");
-  }
-
-  ftpSrv.handleFTP();
-  delay(10);
+//  if (WiFi.status() != WL_CONNECTED) {
+//    init_wifi();
+//    Serial.println("***** WiFi reconnect *****");
+//  }
+//
+//  wakeup = millis();
+//  if (wakeup - last_wakeup > (10 * 60 * 1000) ) {       // 10 minutes
+//    last_wakeup = millis();
+//
+//    print_stats("Wakeup in loop() Core: ");
+//  }
+//
+//  ftpSrv.handleFTP();
+//  delay(10);
 
 }
 
