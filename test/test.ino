@@ -10,13 +10,6 @@
 #include "esp_vfs_fat.h"
 #include "ESP_Mail_Client.h"      // e-Mail Functionality
 
-// DEFINES & GLOBAL VARIABLES
-#define BUILTIN_LED 4
-#define MS_PIN 13
-#define FPS 1                                // Frames Per Second
-#define LoopDelay 1000/FPS                    // Delay Between Frames
-uint16_t picNum = 1;
-
 // CAMERA_MODEL_AI_THINKER
 #define PWDN_GPIO_NUM     32
 #define RESET_GPIO_NUM    -1
@@ -35,30 +28,41 @@ uint16_t picNum = 1;
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
-// INTERNET: ssid and password
-const char* ssid = "Network";
-const char* password = "Password";
+// Define minimal time to record after every sensor activation 
+#define waitTime 2                            // Wait Time defined in seconds
+#define FPS 1                                // Frames Per Second
+#define LoopDelay 1000/FPS                    // Delay Between Frames
 
-void setup() {
+/* ----- ----- SET MOTION SENSOR INPUT PIN AND LEDPin OUTPUT PIN VALUES ----- ----- */             
+const int MSPin = 13;
+
+/* ----- ----- MAIN PROGRAM ----- ----- */
+void setup() 
+{
   Serial.println("Woke up");
-  Serial.begin(115200);
+  // SETTING UP SERIAL COMMUNICATION -----------------------------------
+  Serial.begin(115200);                         // Sets the data rate in bits per second (baud) for serial data transmission.
+
+  // SETTING UP PINS -----------------------------------
+  pinMode(MSPin, INPUT_PULLUP);                 // Set PIR Motion Sensor mode to INPUT_PULLUP
 
   init_SD_card_and_cam();
-  pinMode(MS_PIN, INPUT_PULLUP);                 // Set PIR Motion Sensor mode to INPUT_PULLUP
-
-  take_pic_routine();
   
+  unsigned long lastTrigger = 0;
+  while(digitalRead(MSPin)){
+   Serial.println("DigitalRead High"); 
+   delay(LoopDelay);
+  }
+
+  Serial.println("DigitalRead Low");
+
   sleep();
 }
 
-void loop() {
-}
+void loop() {}
 
 void init_SD_card_and_cam() {
   // Specify that LED pin will be low
-    pinMode(BUILTIN_LED, OUTPUT);
-    digitalWrite(BUILTIN_LED, LOW);
-
     esp_err_t ret = ESP_FAIL;
     sdmmc_host_t host = SDMMC_HOST_DEFAULT();
     // this tells SD host to keep using 1-line bus mode
@@ -126,43 +130,7 @@ void init_SD_card_and_cam() {
   }
 }
 
-void take_pic_routine(){
-  while(digitalRead(MS_PIN)){
-    // Initialize memory for frame buffer
-      camera_fb_t * fb = NULL;
-      fb = esp_camera_fb_get();       // Take Picture!
-      if (!fb) {
-        Serial.println("Camera capture failed");
-        sleep();
-      }
-
-    // Create Path
-    String path = "/pic - " + String(picNum++) + ".jpg";
-
-    // Writing to SD Card
-    Serial.println("Starting SD Card...");
-    if(!MailClient.sdBegin(14,2,15,13)){
-      Serial.println("SD Card Mount Failed");
-      sleep();
-    }
-
-    fs::FS &fs = SD;
-    File file = fs.open(path.c_str(), FILE_WRITE);
-    if(!file){
-      Serial.printf("Failed to save to path: %s\n", path.c_str());
-      sleep();
-    } else {
-      file.write(fb->buf, fb->len); // payload (image), payload length
-      Serial.printf("Saved file to path: %s\n", path.c_str());
-    }
-    file.close();
-    esp_camera_fb_return(fb);
-    
-    delay(LoopDelay);
-  }
-}
-
-void sleep(){
+void sleep() {
   Serial.println("Going to Sleep...");
   Serial.flush();
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_13,1);
