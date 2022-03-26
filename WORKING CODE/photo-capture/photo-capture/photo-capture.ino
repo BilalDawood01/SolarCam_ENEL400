@@ -1,4 +1,6 @@
 // INCLUDE LIBRARIES
+#include "esp_log.h"
+#include "esp_http_server.h"
 #include "Arduino.h"              // General Functionality
 #include "esp_camera.h"           // Camera
 #include <SD.h>                   // SD Card
@@ -8,18 +10,102 @@
 #include "driver/rtc_io.h"
 //#include <EEPROM.h>               // read and write from flash memory
 //#include <WiFi.h>                 // WiFi Functionality
-#include "time.h"                 // Time functions
 #include "ESP_Mail_Client.h"      // e-Mail Functionality
+#include <ESPmDNS.h>
+#include "ESP32FtpServer.h"
+#include <HTTPClient.h>
 
+FtpServer ftpSrv;   //set #define FTP_DEBUG in ESP32FtpServer.h to see ftp verbose on serial
+
+// Time
+#include "time.h"                 // Time functions
+
+#include "lwip/err.h"
+#include "lwip/apps/sntp.h"
+
+// MicroSD
+#include "driver/sdmmc_host.h"
+#include "driver/sdmmc_defs.h"
+#include "sdmmc_cmd.h"
+#include "esp_vfs_fat.h"
+
+// SETTINGS! 
 // Define minimal time to record after every sensor activation 
 #define waitTime 5                            // Wait Time defined in seconds
 #define FPS 1                                // Frames Per Second
 #define LoopDelay 1000/FPS                    // Delay Between Frames
 
-/* ----- ----- SET MOTION SENSOR INPUT PIN AND LEDPin OUTPUT PIN VALUES ----- ----- */
-const int LEDPin = 13;               
+/* ----- ----- SET MOTION SENSOR INPUT PIN ----- ----- */            
 const int MSPin = 14;
 uint16_t picNum = 1;
+
+long current_millis;
+long last_capture_millis = 0;
+static esp_err_t cam_err;
+static esp_err_t card_err;
+char strftime_buf[64];
+int file_number = 0;
+bool internet_connected = false;
+struct tm timeinfo;
+time_t now;
+
+char *filename ;
+char *stream ;
+int newfile = 0;
+int frames_so_far = 0;
+FILE *myfile;
+long bp;
+long ap;
+long bw;
+long aw;
+long totalp;
+long totalw;
+float avgp;
+float avgw;
+int overtime_count = 0;
+
+// GLOBALS
+#define BUFFSIZE 512
+
+// global variable used by these pieces
+
+char str[20];
+uint16_t n;
+uint8_t buf[BUFFSIZE];
+
+static int i = 0;
+uint8_t temp = 0, temp_last = 0;
+unsigned long fileposition = 0;
+uint16_t frame_cnt = 0;
+uint16_t remnant = 0;
+uint32_t length = 0;
+uint32_t startms;
+uint32_t elapsedms;
+uint32_t uVideoLen = 0;
+bool is_header = false;
+long bigdelta = 0;
+int other_cpu_active = 0;
+int skipping = 0;
+int skipped = 0;
+
+int fb_max = 12;
+
+camera_fb_t * fb_q[30];
+int fb_in = 0;
+int fb_out = 0;
+
+camera_fb_t * fb = NULL;
+
+FILE *avifile = NULL;
+FILE *idxfile = NULL;
+
+//
+//
+// EDIT ssid and password
+//
+// zzz
+const char* ssid = "Network";
+const char* password = "Password";
 
 /* ----- ----- OFT-REPEATED SLEEP FUNCTION ----- ----- */
 void sleep(){
@@ -38,8 +124,6 @@ void setup()
 
   // SETTING UP PINS -----------------------------------
   pinMode(MSPin, INPUT_PULLUP);                 // Set PIR Motion Sensor mode to INPUT_PULLUP
-  pinMode(LEDPin, OUTPUT);                      // Set LEDPin pin as an output
-  digitalWrite(LEDPin, LOW);                    // Set LEDPin pin to LOW
 
   // PIN DEFINITIONS FOR AI THINKER -----------------------------------
   camera_config_t config;
@@ -92,8 +176,6 @@ void setup()
     } else {
       Serial.println("DigitalRead Low but Within Wait Time"); 
     }
-    
-    digitalWrite(LEDPin, HIGH);                 // Set LEDPin pin to HIGH
 
     // Initialize memory for frame buffer
       camera_fb_t * fb = NULL;
@@ -116,11 +198,11 @@ void setup()
     fs::FS &fs = SD;
     File file = fs.open(path.c_str(), FILE_WRITE);
     if(!file){
-      Serial.println("Failed to save to path: %s\n", path.c_str());
+      Serial.printf("Failed to save to path: %s\n", path.c_str());
       sleep();
     } else {
       file.write(fb->buf, fb->len); // payload (image), payload length
-      Serial.println("Saved file to path: %s\n", path.c_str());
+      Serial.printf("Saved file to path: %s\n", path.c_str());
     }
     file.close();
     esp_camera_fb_return(fb);
@@ -129,7 +211,6 @@ void setup()
   }
 
   Serial.println("DigitalRead Low");
-  digitalWrite(LEDPin, LOW);                    // Set LEDPin pin to LOW
 
   // GOING TO DEEP SLEEP -----------------------------------
   sleep();

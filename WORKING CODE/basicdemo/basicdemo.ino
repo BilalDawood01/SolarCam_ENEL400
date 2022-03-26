@@ -6,7 +6,7 @@
 
 /* ----- ----- SET MOTION SENSOR INPUT PIN AND LEDPin OUTPUT PIN VALUES ----- ----- */
 const int LEDPin = 13;               
-const int MSPin = 14;
+const int MSPin = 12;
 
 /* ----- ----- MAIN PROGRAM ----- ----- */
 void setup() 
