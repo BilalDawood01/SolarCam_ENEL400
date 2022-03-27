@@ -44,8 +44,8 @@
 
 // DEFINES
 #define USE_INCREMENTAL_FILE_NUMBERING //Uses EEPROM to store latest file stored
-#define USE_TIMESTAMP // Uses Wi-Fi to retrieve current time value
-#define SEND_EMAIL // Uses Wi-Fi to email photo attachment
+//#define USE_TIMESTAMP // Uses Wi-Fi to retrieve current time value
+//#define SEND_EMAIL // Uses Wi-Fi to email photo attachment
 #define TRIGGER_MODE // Photo capture triggered by GPIO pin rising/falling
 //#define TIMED_MODE // Photo capture automated according to regular delay
 
