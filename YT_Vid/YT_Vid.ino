@@ -55,7 +55,7 @@
 #define SMTP_HOST "smtp.office365.com"
 #define SMTP_PORT 25
 #define AUTHOR_EMAIL "enel400proj@outlook.com"
-#define AUTHOR_PASSWORD "esp32cam"
+#define AUTHOR_PASSWORD "tcbevwgkinssmzwd" //app password
 
 // CONSTANTS
 // GPIO Pin 33 is small red LED near to RESET button on the back of the board
@@ -361,7 +361,7 @@ void setup() {
     message.sender.name = "ESP32-CAM";
     message.sender.email = AUTHOR_EMAIL;
     message.subject = "Motion Detected - ESP32-CAM";
-    message.addRecipient("Me", "nameofrecipient@gmail.com");
+    message.addRecipient("Me", "enel400proj@outlook.com");
     //message.addRecipient("name2", "email2");
     //message.addCc("email3");
     //message.addBcc("email4");
