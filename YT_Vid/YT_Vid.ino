@@ -384,7 +384,7 @@ void setup() {
     if(!smtp.connect(&session)) {
       Serial.println("Couldn't connect");
       sleep();
-    }
+    }p
     // Start sending Email and close the session
     Serial.println("Sending Mail");
     if(!MailClient.sendMail(&smtp, &message)) {
